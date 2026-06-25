@@ -1,0 +1,21 @@
+{
+  "name": "safdar-portfolio",
+  "version": "1.0.0",
+  "description": "Safdar Hashim portfolio site with Express API on Vercel + Neon Postgres",
+  "type": "module",
+  "scripts": {
+    "db:init": "node scripts/init-db.js",
+    "db:seed-admin": "node scripts/seed-admin.js",
+    "start": "node scripts/local-server.js",
+    "dev": "vercel dev"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^0.10.4",
+    "bcryptjs": "^2.4.3",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2"
+  },
+  "devDependencies": {
+    "dotenv": "^16.4.7"
+  }
+}

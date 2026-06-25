@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Safdar Hashim | Portfolio</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Confetti Library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+            scroll-behavior: smooth;
+        }
+
+        /* Variables for easy theme switching */
+        :root {
+            --bg-color: #F5F5DC;
+            --text-color: #333;
+            --nav-bg: #ff8c00; 
+            --card-bg: #fff;
+            --accent: #ff8c00;
+        }
+
+        body.dark-mode {
+            --bg-color: #121212;
+            --text-color: #f1f1f1;
+            --nav-bg: #ff8c00; 
+            --card-bg: #1e1e1e;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s ease, color 0.3s ease;
+            overflow-x: hidden;
+        }
+
+        /* --- NAVIGATION --- */
+        nav {
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%); 
+            width: 90%;
+            max-width: 1200px;
+            z-index: 1000;
+            background-color: var(--nav-bg);
+            border-radius: 50px;
+            box-shadow: 0 8px 20px rgba(255, 140, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .nav-logo {
+            font-size: 1rem;
+            font-weight: 1000;
+            color: #fff;
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            align-items: center;
+        }
+
+        nav ul li { margin-left: 20px; }
+
+        nav ul li a {
+            text-decoration: none;
+            color: #fff;
+            font-weight: bold;
+            font-size: 1rem;
+            transition: 0.3s ease;
+            padding: 8px 15px;
+            border-radius: 20px;
+        }
+
+        nav ul li a:hover { 
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Hamburger Styles */
+        .hamburger {
+            display: none;
+            cursor: pointer;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        /* --- SECTIONS --- */
+        section {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 120px 10% 80px 10%;
+        }
+
+        .highlight { color: var(--accent); }
+
+        /* --- HOME SECTION --- */
+        #home .container { width: 100%; max-width: 1200px; }
+        .hero-layout { display: flex; align-items: center; justify-content: space-between; gap: 40px; width: 100%; }
+        .text-side { flex: 1; text-align: left; }
+        .side-heading { font-size: 3.5rem; font-weight: 700; line-height: 1.1; color: var(--text-color); margin-bottom: 10px; letter-spacing: -1px; }
+        .hero-subtext { font-size: 2.6rem; color: var(--accent); font-weight: 400; margin-bottom: 25px; display: block; text-transform: uppercase; letter-spacing: 1px; }
+        .home-socials { display: flex; gap: 30px; align-items: center; margin-bottom: 10px; margin-top: 20px; }
+        .home-socials a { font-size: 30px; color: var(--text-color); transition: 0.3s; }
+        .home-socials a:hover { color: var(--accent); transform: scale(1.2); }
+        .resume-wrapper { margin-top: 25px; display: flex; justify-content: flex-start; }
+        .resume-btn-main { display: inline-flex; align-items: center; gap: 12px; padding: 12px 30px; background: var(--accent); color: #fff; text-decoration: none; border-radius: 50px; font-weight: bold; font-size: 1rem; transition: all 0.3s ease; border: 2px solid var(--accent); box-shadow: 0 4px 15px rgba(255, 140, 0, 0.2); }
+        .resume-btn-main:hover { background: transparent; color: var(--accent); transform: translateY(-3px); box-shadow: 0 6px 20px rgba(255, 140, 0, 0.4); }
+
+        /* --- MODERN SLIDING TOGGLE SWITCH --- */
+        .theme-manager { 
+            width: 100%; 
+            display: flex; 
+            justify-content: center; 
+            margin-top: 35px; 
+        }
+
+        .toggle-container {
+            position: relative;
+            width: 70px;
+            height: 34px;
+        }
+
+        .toggle-container input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+            display: flex;
+            align-items: center;
+            padding: 0 8px;
+            justify-content: space-between;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+            z-index: 2;
+        }
+
+        .slider i {
+            font-size: 14px;
+            color: #555;
+            z-index: 1;
+        }
+
+        input:checked + .slider {
+            background-color: var(--accent);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(36px);
+        }
+
+        .image-side { flex: 1; display: flex; justify-content: flex-end; }
+        .image-side img { width: 400px; height: 400px; object-fit: cover; border-radius: 50%; border: 8px solid var(--accent); box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+
+        /* --- ABOUT SECTION --- */
+        .about-container { display: flex; align-items: center; justify-content: center; gap: 50px; max-width: 1100px; width: 100%; }
+        .about-image { width: 380px; height: 380px; position: relative; overflow: hidden; border-radius: 30px; border: 8px solid var(--card-bg); box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .about-image img { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; opacity: 0; transition: opacity 0.5s ease-in-out; }
+        .about-image img.active { opacity: 1; }
+        .slide-btn { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255, 140, 0, 0.7); color: white; border: none; width: 40px; height: 40px; cursor: pointer; border-radius: 50%; z-index: 10; transition: 0.3s; display: flex; align-items: center; justify-content: center; }
+        .slide-btn:hover { background: var(--accent); }
+        .prev-btn { left: 10px; }
+        .next-btn { right: 10px; }
+        .about-text { flex: 1; text-align: left; }
+        .about-text h1 { margin-bottom: 20px; font-size: 3rem; }
+        .about-text p { font-size: 1.1rem; line-height: 1.8; color: var(--text-color); text-align: justify; margin-bottom: 25px; }
+        .about-resume-btn { display: inline-flex; align-items: center; gap: 10px; padding: 8px 25px; background: var(--accent); color: #fff; text-decoration: none; border-radius: 30px; font-weight: bold; transition: 0.3s; border: 2px solid var(--accent); }
+        .about-resume-btn:hover { background: transparent; color: var(--accent); }
+        
+        /* --- PROJECTS SECTION --- */
+        #projects { flex-direction: column; text-align: center; }
+        .project-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; width: 100%; max-width: 1100px; margin-top: 40px; }
+        .project-card { background: var(--card-bg); border-radius: 25px; overflow: hidden; box-shadow: 0 10px 20px rgba(0,0,0,0.1); transition: 0.3s; }
+        .project-card:hover { transform: translateY(-10px); }
+        .project-card img { width: 100%; height: 200px; object-fit: cover; }
+        .project-info { padding: 20px; }
+        .project-info h3 { margin-bottom: 10px; color: var(--accent); }
+        .project-btn { display: inline-block; margin-top: 15px; padding: 8px 20px; background: var(--accent); color: #fff; text-decoration: none; border-radius: 20px; font-weight: bold; transition: 0.3s; }
+        
+        /* --- FAVORITES SECTION --- */
+        #favorite { flex-direction: column; text-align: center; }
+        .favorite-description { margin-top: 20px; font-size: 1.2rem; color: var(--text-color); line-height: 1.6; max-width: 800px; }
+        .fav-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; width: 100%; max-width: 1200px; margin-top: 40px; }
+        .fav-item { overflow: hidden; border-radius: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); background: var(--card-bg); border: 5px solid var(--card-bg); transition: 0.3s ease; display: flex; flex-direction: column; }
+        .fav-item img { width: 100%; height: 220px; object-fit: cover; transition: 0.5s ease; }
+        .fav-item:hover { transform: translateY(-5px); border-color: var(--accent); }
+        .fav-item:hover img { transform: scale(1.1); }
+        .fav-caption { padding: 10px 5px; font-weight: bold; color: var(--text-color); font-size: 0.9rem; background: var(--card-bg); }
+        
+        /* --- CONTACT SECTION --- */
+        #contact { flex-direction: column; min-height: auto; padding-bottom: 100px; }
+        .contact-container { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 40px; width: 100%; max-width: 1100px; margin-top: 40px; }
+        .contact-form { background: var(--card-bg); padding: 40px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        .contact-form input, .contact-form textarea { width: 100%; padding: 18px; margin-bottom: 15px; border: 2px solid #eee; border-radius: 15px; outline: none; background: #fdfdfd; color: #333; }
+        .contact-form button { background: var(--accent); color: white; border: none; width: 100%; padding: 18px; border-radius: 15px; font-weight: bold; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .contact-form button:hover { opacity: 0.9; transform: translateY(-2px); }
+        .social-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
+        .social-card { background: var(--card-bg); padding: 20px; display: flex; align-items: center; justify-content: center; gap: 15px; border-radius: 15px; text-decoration: none; color: var(--text-color); transition: 0.3s; border: 2px solid transparent; }
+        .social-card:hover { border-color: var(--accent); }
+        .social-card i { color: #FF8C00; font-size: 1.5rem; }
+        
+        footer { background: #000; color: #fff; text-align: center; padding: 60px 10% 40px 10%; }
+        .footer-socials { display: flex; justify-content: center; gap: 25px; margin: 20px 0; }
+        .footer-socials a { color: #fff; font-size: 1.5rem; transition: 0.3s; }
+        .footer-socials a:hover { color: var(--accent); transform: translateY(-3px); }
+        .footer-email { display: block; margin-bottom: 20px; color: #bbb; text-decoration: none; font-size: 1rem; transition: 0.3s; }
+        footer .back-to-top { color: #000; text-decoration: none; font-weight: bold; display: inline-block; margin-bottom: 25px; background: #fff; padding: 10px 25px; border-radius: 50px; font-size: 0.9rem; transition: 0.3s; }
+
+        /* --- RESPONSIVE --- */
+        @media (max-width: 1000px) {
+            .hero-layout { flex-direction: column; text-align: center; }
+            .text-side { text-align: center; order: 2; }
+            .home-socials, .resume-wrapper { justify-content: center; }
+            .image-side { order: 1; justify-content: center; }
+            .image-side img { width: 300px; height: 300px; }
+            .fav-grid { grid-template-columns: repeat(2, 1fr); }
+            .about-container { flex-direction: column; text-align: center; }
+            .about-text { text-align: center; }
+            .about-text p { text-align: center; }
+        }
+
+        @media (max-width: 600px) {
+            nav { width: 95%; padding: 0 15px; height: auto; padding: 15px; flex-wrap: wrap; }
+            .hamburger { display: block; }
+            
+            nav ul {
+                display: none; 
+                flex-direction: column;
+                width: 100%;
+                margin-top: 15px;
+                padding-top: 10px;
+                border-top: 1px solid rgba(255,255,255,0.2);
+            }
+
+            nav ul.active { display: flex; } 
+            nav ul li { margin: 10px 0; width: 100%; text-align: center; }
+            
+            .fav-grid { grid-template-columns: 1fr; }
+            .contact-container { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="#home" class="nav-logo">safdar <span style="color: #fff;">hashim</span></a>
+        
+        <div class="hamburger" id="hamburger">
+            <i class="fas fa-bars"></i>
+        </div>
+
+        <ul id="nav-links">
+            <li><a href="#home">Home</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#projects">Projects</a></li>
+            <li><a href="#favorite">Favorites</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+    </nav>
+
+    <section id="home">
+        <div class="container">
+            <div class="hero-layout">
+                <div class="text-side">
+                    <h2 class="side-heading">
+                        Hello, I'm <br><span class="highlight">Safdar Hashim</span>
+                    </h2>
+                    <span class="hero-subtext">Full Stack Web Developer</span>
+                    
+                    <div class="home-socials">
+                        <a href="https://www.linkedin.com/in/safdar-hashim-4156783a7/" target="_blank"><i class="fab fa-linkedin"></i></a>
+                        <a href="https://www.tiktok.com/@safdarwazirofficial" target="_blank"><i class="fab fa-tiktok"></i></a>
+                        <a href="https://www.facebook.com/share/1EZ75X7dPA/" target="_blank"><i class="fab fa-facebook"></i></a>
+                        <a href="https://www.instagram.com/safdarwazirofficial?igsh=bXZrbmdkMW8xaXl1&utm_source=qr" target="_blank"><i class="fab fa-instagram"></i></a>
+                    </div>
+
+                    <div class="resume-wrapper">
+                        <a href="resume.pdf" target="_blank" rel="noopener" class="resume-btn-main">
+                            <i class="fas fa-file-download"></i>Resume
+                        </a>
+                    </div>
+                </div>
+
+                <div class="image-side">
+                    <img src="smile/stadium.jpeg" alt="Safdar Hashim">
+                </div>
+            </div>
+
+            <div class="theme-manager">
+                <label class="toggle-container">
+                    <input type="checkbox" id="theme-checkbox">
+                    <span class="slider">
+                        <i class="fas fa-sun"></i>
+                        <i class="fas fa-moon"></i>
+                    </span>
+                </label>
+            </div>
+        </div>
+    </section>
+
+    <section id="about">
+        <div class="about-container">
+            <div class="about-image">
+                <div id="slideshow-container">
+                    <img src="smile/out.jpeg" alt="Safdar Photo 1" class="active">
+                    <img src="smile/hussain.jfif" alt="Safdar Photo 2">
+					 <img src="smile/naveed.jpeg" alt="Safdar Photo 4">
+					 <img src="smile/ham.jpg" alt="Safdar Photo 5">
+					 	 
+					 
+                </div>
+                <button class="slide-btn prev-btn" onclick="moveSlide(-1)"><i class="fas fa-chevron-left"></i></button>
+                <button class="slide-btn next-btn" onclick="moveSlide(1)"><i class="fas fa-chevron-right"></i></button>
+            </div>
+            <div class="about-text">
+                <h1>About <span class="highlight">Me</span></h1>
+                <p>
+                    <strong> Safdar Hashim </strong> is a 12th-grade student from North Waziristan who is already 
+                    a talented web developer. He loves building websites and wants to have a great career
+                    in computer science. By practicing his coding skills every day, he is preparing for a bright
+                    future in the tech world. He works hard on both his school studies and his personal web projects 
+                    to gain experience. Safdar believes that learning new programming languages is the key to solving
+                    modern problems. His goal is to use his technical skills to create innovative tools that help people.
+                </p>
+                <a href="resume.pdf" target="_blank" rel="noopener" class="about-resume-btn">
+                    <i class="fas fa-file-download"></i> Resume
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section id="projects">
+        <h1>My <span class="highlight">Projects</span></h1>
+        <div class="project-grid">
+            <div class="project-card">
+                <img src="smile/hi.png" alt="Safdar Typing Club">
+                <div class="project-info">
+                    <h3>Safdar Typing Club</h3>
+                    <p>A web-based platform for touch-typing training built with HTML, CSS, and JS.</p>
+                    <a href="https://safdarhashim-ten.vercel.app/index.html" class="project-btn">View Live</a>
+                </div>
+            </div>
+            <div class="project-card">
+                <img src="smile/Capture.jpeg" alt="Project 2">
+                <div class="project-info">
+                    <h3>Personal Portfolio</h3>
+                    <p>My creative portfolio showcasing my skills and projects.</p>
+                    <a href="https://safdar-project.vercel.app/index.html" class="project-btn">View Live</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="favorite">
+        <h1>My <span class="highlight">Favorites</span></h1>
+        <p class="favorite-description">A collection of things that inspire me, from sacred places and innovative tech to my favorite sports and delicious food.</p>
+        <div class="fav-grid">
+            <div class="fav-item"><img src="smile/makkah.jpg"><div class="fav-caption">Favorite place to visit</div></div>
+            <div class="fav-item"><img src="smile/micro.jfif"><div class="fav-caption">Dream Job</div></div>
+            <div class="fav-item"><img src="smile/volleyball.jpg"><div class="fav-caption">Favorite Sport</div></div>
+            <div class="fav-item"><img src="smile/art.jpg"><div class="fav-caption">Art is My Passion</div></div>
+            <div class="fav-item"><img src="smile/london.jpeg"><div class="fav-caption"> Favorite City</div></div>
+            <div class="fav-item"><img src="smile/bannu.jfif"><div class="fav-caption">Favorite Singer</div></div>
+            <div class="fav-item"><img src="smile/rice.jpg"><div class="fav-caption">Favorite Food</div></div>
+            <div class="fav-item"><img src="smile/drunk.jpeg"><div class="fav-caption">Favorite Drink</div></div>
+        </div>
+    </section>
+
+    <section id="contact">
+        <h1>GET IN <span class="highlight">TOUCH</span></h1>
+        <div class="contact-container">
+            <div class="contact-form">
+                <form id="contactForm">
+                    <input type="text" name="name" placeholder="Your Name" required>
+                    <input type="email" name="email" placeholder="Your Email" required>
+                    <textarea name="message" placeholder="Your Message" rows="5" required></textarea>
+                    
+                    <button type="submit" id="submitBtn">
+                        <i class="fas fa-paper-plane"></i> Send Message
+                    </button>
+                </form>
+                
+                <!-- Success Message -->
+                <div id="successMessage" style="display:none; text-align:center; padding: 20px;">
+                    <i class="fas fa-check-circle" style="font-size: 3rem; color: #ff8c00; margin-bottom: 10px;"></i>
+                    <h3 style="color: var(--text-color);">Thank you!</h3>
+                    <p style="color: var(--text-color);">Your message has been sent successfully.</p>
+                </div>
+            </div>
+
+            <div class="social-grid">
+                <a href="https://www.linkedin.com/in/safdar-hashim-4156783a7/" target="_blank" class="social-card"><i class="fab fa-linkedin"></i><h3>LinkedIn</h3></a>
+                <a href="https://www.tiktok.com/@safdarwazirofficial" target="_blank" class="social-card"><i class="fab fa-tiktok"></i><h3>TikTok</h3></a>
+                <a href="https://www.facebook.com/share/1EZ75X7dPA/" target="_blank" class="social-card"><i class="fab fa-facebook"></i><h3>Facebook</h3></a>
+                <a href="https://www.instagram.com/safdarwazirofficial?igsh=bXZrbmdkMW8xaXl1&utm_source=qr" target="_blank" class="social-card"><i class="fab fa-instagram"></i> <h3> Instagram</h3></a>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <a href="#home" class="back-to-top"><i class="fas fa-chevron-up"></i> Back to Top</a>
+        <div class="footer-socials">
+            <a href="https://www.linkedin.com/in/safdar-hashim-4156783a7/" target="_blank"><i class="fab fa-linkedin"></i></a>
+            <a href="https://www.tiktok.com/@safdarwazirofficial" target="_blank"><i class="fab fa-tiktok"></i></a>
+            <a href="https://www.facebook.com/share/1EZ75X7dPA/" target="_blank"><i class="fab fa-facebook"></i></a>
+            <a href="https://wa.me/923377474753" target="_blank" title="Chat on WhatsApp"><i class="fab fa-whatsapp"></i></a>
+        </div>
+        
+        <a href="mailto:safdarwasir@gmail.com" class="footer-email"><i class="fas fa-envelope"></i> safdarwasir@gmail.com</a>
+        <p>&copy; 2026 Safdar Hashim. All Rights Reserved.</p>
+    </footer>
+
+    <script>
+        /* Hamburger Menu Script */
+        const hamburger = document.getElementById('hamburger');
+        const navLinks = document.getElementById('nav-links');
+
+        hamburger.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+        });
+
+        navLinks.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                navLinks.classList.remove('active');
+            });
+        });
+
+        /* Manual Slideshow */
+        let slideIndex = 0;
+        const slides = document.querySelectorAll("#slideshow-container img");
+
+        function showSlide(n) {
+            if (slides.length === 0) return;
+            slides.forEach(img => img.classList.remove("active"));
+            slideIndex = n;
+            if (slideIndex >= slides.length) { slideIndex = 0; }
+            if (slideIndex < 0) { slideIndex = slides.length - 1; }
+            slides[slideIndex].classList.add("active");
+        }
+
+        function moveSlide(n) {
+            showSlide(slideIndex + n);
+        }
+
+        /* Dark Mode Script */
+        const themeCheckbox = document.getElementById('theme-checkbox');
+        const body = document.body;
+
+        themeCheckbox.addEventListener('change', () => {
+            if (themeCheckbox.checked) {
+                body.classList.add('dark-mode');
+            } else {
+                body.classList.remove('dark-mode');
+            }
+        });
+
+        /* UPDATED Contact Form Script with Confetti */
+        const contactForm = document.getElementById('contactForm');
+        const successMessage = document.getElementById('successMessage');
+        const submitBtn = document.getElementById('submitBtn');
+
+        contactForm.addEventListener('submit', function(e) {
+            e.preventDefault(); 
+
+            const originalBtnText = submitBtn.innerHTML;
+            submitBtn.innerHTML = "<i class='fas fa-spinner fa-spin'></i> Sending...";
+            submitBtn.disabled = true;
+
+            const formData = new FormData(this);
+
+            fetch('/api/contact', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(Object.fromEntries(formData))
+            })
+            .then(response => {
+                contactForm.style.display = 'none';
+                successMessage.style.display = 'block';
+
+                // Confetti Cannon Launch!
+                var count = 200;
+                var defaults = {
+                  origin: { y: 0.7 },
+                  colors: ['#ff8c00', '#ffffff', '#ffd700']
+                };
+
+                function fire(particleRatio, opts) {
+                  confetti({
+                    ...defaults,
+                    ...opts,
+                    particleCount: Math.floor(count * particleRatio)
+                  });
+                }
+
+                fire(0.25, { spread: 26, startVelocity: 55 });
+                fire(0.2, { spread: 60 });
+                fire(0.35, { spread: 100, decay: 0.91, scalar: 0.8 });
+                fire(0.1, { spread: 120, startVelocity: 25, decay: 0.92, scalar: 1.2 });
+                fire(0.1, { spread: 120, startVelocity: 45 });
+            })
+            .catch(error => {
+                alert("Something went wrong. Please try again.");
+                submitBtn.innerHTML = originalBtnText;
+                submitBtn.disabled = false;
+            });
+        });
+    </script>
+</body>
+</html>
