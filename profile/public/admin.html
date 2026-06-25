@@ -24,6 +24,22 @@
         .muted { color: #888; font-size: .85rem; }
         .hidden { display: none; }
         .count { font-weight: normal; color: #888; font-size: 1rem; }
+
+        /* toolbar above the table: delete button + selection info */
+        .toolbar { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; min-height: 44px; flex-wrap: wrap; }
+        .danger { background: #d9534f; }
+        .danger:disabled { background: #e6a6a4; cursor: not-allowed; opacity: 1; }
+        .sel-info { color: #888; font-size: .9rem; }
+
+        /* checkbox column */
+        td.chk, th.chk { width: 36px; text-align: center; }
+        input[type="checkbox"] { width: auto; margin: 0; cursor: pointer; transform: scale(1.2); }
+
+        /* pagination footer */
+        .pager { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
+        .pager button { background: #fff; color: var(--text); border: 2px solid #eee; padding: 8px 16px; }
+        .pager button:disabled { color: #bbb; cursor: not-allowed; }
+        .pager .page-label { color: #555; font-size: .9rem; }
     </style>
 </head>
 <body> 
@@ -47,7 +63,16 @@
             <button class="logout" id="logoutBtn">Log Out</button>
         </div>
         <div class="card">
+            <div class="toolbar">
+                <button class="danger" id="deleteBtn" type="button" disabled>Delete Selected</button>
+                <span class="sel-info" id="selInfo">No rows selected</span>
+            </div>
             <div id="tableWrap"><p class="muted">Loading…</p></div>
+            <div class="pager hidden" id="pager">
+                <button id="prevBtn" type="button">‹ Prev</button>
+                <span class="page-label" id="pageLabel"></span>
+                <button id="nextBtn" type="button">Next ›</button>
+            </div>
         </div>
     </div>
 
@@ -100,29 +125,60 @@
             showLogin();
         });
 
+        // ---- Pagination + selection state ----
+        const PAGE_SIZE = 10;
+        let currentPage = 1;
+        let totalPages = 1;
+
+        const wrap = document.getElementById('tableWrap');
+        const pager = document.getElementById('pager');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const pageLabel = document.getElementById('pageLabel');
+        const deleteBtn = document.getElementById('deleteBtn');
+        const selInfo = document.getElementById('selInfo');
+
+        prevBtn.addEventListener('click', () => { if (currentPage > 1) { currentPage--; loadMessages(); } });
+        nextBtn.addEventListener('click', () => { if (currentPage < totalPages) { currentPage++; loadMessages(); } });
+        deleteBtn.addEventListener('click', deleteSelected);
+
+        function authHeaders() {
+            return { Authorization: 'Bearer ' + localStorage.getItem(TOKEN_KEY) };
+        }
+
+        function handleAuthFail(res) {
+            if (res.status === 401 || res.status === 403) {
+                localStorage.removeItem(TOKEN_KEY);
+                showLogin();
+                return true;
+            }
+            return false;
+        }
+
         async function loadMessages() {
-            const wrap = document.getElementById('tableWrap');
-            const token = localStorage.getItem(TOKEN_KEY);
             try {
-                const res = await fetch('/api/admin/messages', {
-                    headers: { Authorization: 'Bearer ' + token }
+                const res = await fetch(`/api/admin/messages?page=${currentPage}&limit=${PAGE_SIZE}`, {
+                    headers: authHeaders()
                 });
-                if (res.status === 401 || res.status === 403) {
-                    localStorage.removeItem(TOKEN_KEY);
-                    showLogin();
-                    return;
-                }
+                if (handleAuthFail(res)) return;
+
                 const data = await res.json();
                 const rows = data.messages || [];
-                document.getElementById('count').textContent = '(' + rows.length + ')';
+                totalPages = data.totalPages || 1;
+                currentPage = data.page || 1;
+
+                document.getElementById('count').textContent = '(' + (data.total ?? rows.length) + ')';
 
                 if (rows.length === 0) {
                     wrap.innerHTML = '<p class="muted">No submissions yet.</p>';
+                    pager.classList.add('hidden');
+                    updateSelection();
                     return;
                 }
 
                 const body = rows.map(r => `
                     <tr>
+                        <td class="chk"><input type="checkbox" class="row-chk" value="${r.id}"></td>
                         <td>${escapeHtml(r.name)}</td>
                         <td><a href="mailto:${escapeHtml(r.email)}">${escapeHtml(r.email)}</a></td>
                         <td class="msg">${escapeHtml(r.message)}</td>
@@ -131,11 +187,74 @@
 
                 wrap.innerHTML = `
                     <table>
-                        <thead><tr><th>Name</th><th>Email</th><th>Message</th><th>Received</th></tr></thead>
+                        <thead><tr>
+                            <th class="chk"><input type="checkbox" id="selectAll" title="Select all on this page"></th>
+                            <th>Name</th><th>Email</th><th>Message</th><th>Received</th>
+                        </tr></thead>
                         <tbody>${body}</tbody>
                     </table>`;
+
+                // Wire up checkboxes
+                document.getElementById('selectAll').addEventListener('change', (e) => {
+                    document.querySelectorAll('.row-chk').forEach(cb => { cb.checked = e.target.checked; });
+                    updateSelection();
+                });
+                document.querySelectorAll('.row-chk').forEach(cb =>
+                    cb.addEventListener('change', updateSelection)
+                );
+
+                // Pagination footer
+                pager.classList.remove('hidden');
+                pageLabel.textContent = `Page ${currentPage} of ${totalPages}`;
+                prevBtn.disabled = currentPage <= 1;
+                nextBtn.disabled = currentPage >= totalPages;
+
+                updateSelection();
             } catch {
                 wrap.innerHTML = '<p class="err">Could not load messages.</p>';
+            }
+        }
+
+        function getSelectedIds() {
+            return Array.from(document.querySelectorAll('.row-chk:checked')).map(cb => Number(cb.value));
+        }
+
+        function updateSelection() {
+            const n = getSelectedIds().length;
+            deleteBtn.disabled = n === 0;
+            selInfo.textContent = n === 0 ? 'No rows selected' : `${n} selected`;
+            const selectAll = document.getElementById('selectAll');
+            if (selectAll) {
+                const total = document.querySelectorAll('.row-chk').length;
+                selectAll.checked = total > 0 && n === total;
+            }
+        }
+
+        async function deleteSelected() {
+            const ids = getSelectedIds();
+            if (ids.length === 0) return;
+            if (!confirm(`Delete ${ids.length} message(s)? This cannot be undone.`)) return;
+
+            deleteBtn.disabled = true;
+            try {
+                const res = await fetch('/api/admin/messages', {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json', ...authHeaders() },
+                    body: JSON.stringify({ ids })
+                });
+                if (handleAuthFail(res)) return;
+                if (!res.ok) { alert('Delete failed'); return; }
+
+                // If we deleted the last items on the last page, step back a page.
+                if (currentPage > 1) {
+                    const remainingOnPage = document.querySelectorAll('.row-chk').length - ids.length;
+                    if (remainingOnPage <= 0) currentPage--;
+                }
+                loadMessages();
+            } catch {
+                alert('Network error while deleting');
+            } finally {
+                updateSelection();
             }
         }
 
